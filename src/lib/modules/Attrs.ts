@@ -11,7 +11,7 @@ import { IModuleHook } from "../hooks";
  */
 
 export interface IAttrs {
-    [key: string]: string | number | boolean;
+    [key: string]: string /*| number | boolean*/;
 }
 
 export function updateAttrs(oldVnode: VNode, vnode: VNode): void {
@@ -34,15 +34,16 @@ export function updateAttrs(oldVnode: VNode, vnode: VNode): void {
         // 相同就跳过
         if (cur === old) continue;
         // 不同就更新
-        if (cur === true) {
-            elm.setAttribute(key, '');
-        }
-        else if (cur === false) {
-            elm.removeAttribute(key);
-        }
-        else {
-            elm.setAttribute(key, cur + '');
-        }
+        elm.setAttribute(key, cur + '');
+        // if (cur === true) {
+        //     elm.setAttribute(key, '');
+        // }
+        // else if (cur === false) {
+        //     elm.removeAttribute(key);
+        // }
+        // else {
+        //     elm.setAttribute(key, cur + '');
+        // }
     }
 
     // 对于 oldAttrs 中有，而 attrs 没有的项，去掉

@@ -3,7 +3,7 @@
  */
 
 import VNode, { IVNodeData } from "./VNode";
-import { getType } from '../utils';
+import { getType, getMatchList } from '../utils';
 
 
 /**
@@ -53,6 +53,7 @@ export default function h(type: string, b?: any, c?: any): VNode {
     let text: string;
     let children: VNode[];
 
+    // 处理各个参数类型，用于重载
     const bType = getType(b);
     const cType = getType(c);
 
@@ -76,6 +77,47 @@ export default function h(type: string, b?: any, c?: any): VNode {
     if (type && text != null) {
         children = [h('', text)];
         text = undefined;
+    }
+
+    // 对于 div#id.class[attr='xxx'] 的形式
+    if (type.length) {
+
+        data = data || {};
+
+        // 1. 处理 id
+        let m = type.match(/#([^#\.\[\]]+)/);
+        if (m) {
+            data.props = data.props || {};
+            data.props.id = m[1];
+        }
+
+        // 2. 处理 class
+        const classList = getMatchList(type, /\.([^#\.\[\]]+)/g).map(n => n[1]);
+        if (classList.length) {
+            data.attrs = data.attrs || {};
+            if (data.attrs['class']) {
+                classList.push(
+                    ...(data.attrs['class'] as string)
+                        .split(' ')
+                        .filter(n => n && n.length)
+                );
+            }
+            data.attrs.class = classList.join(' ');
+        }
+
+
+        // 3. 处理 attrs
+        const attrsList = getMatchList(type, /\[(\S+?)=(\S+?)\]/g);
+
+        if (attrsList.length) {
+            data.attrs = data.attrs || {};
+            attrsList.forEach(match => {
+                data.attrs[match[1]] = match[2];
+            });
+        }
+
+        type = type.replace(/(#|\.|\[)\S*/g, '');
+
     }
 
     return new VNode(type, data, children, text);

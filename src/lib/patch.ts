@@ -79,8 +79,6 @@ function patchFactory(modules: IModuleHook[] = []) {
 
         const oldMirror = oldChildren.slice();  // 用来表示哪些oldchildren被用过，位置信息等
 
-        const allM = oldChildren.every(n => n.elm.parentNode === parentElm);
-
         // 如果想无脑点可以直接这样，不复用dom，直接把所有children都更新
         // removeVnodes(parentElm, oldChildren, 0, oldChildren.length - 1);
         // addVnodes(parentElm, null, children, 0, children.length - 1);
@@ -100,8 +98,10 @@ function patchFactory(modules: IModuleHook[] = []) {
 
                 // 把之前的置空，表示已经用过。之后仍然存留的要被删除
                 oldMirror[oldVnodeIndex] = undefined;
-                // 调整顺序
-                parentElm.insertBefore(oldVnode.elm, parentElm.children[i + 1]);
+                // 调整顺序（如果旧的索引对不上新索引）
+                if (oldVnodeIndex !== i) {
+                    parentElm.insertBefore(oldVnode.elm, parentElm.children[i + 1]);
+                }
                 // 比较数据,进行更新
                 patchVNode(oldVnode, vnode);
             }
@@ -144,7 +144,7 @@ function patchFactory(modules: IModuleHook[] = []) {
         // 注释节点不考虑
 
         // 如果是文本节点
-        if (vnode.text !== undefined) {
+        if (vnode.text !== undefined && vnode.text !== oldVnode.text) {
             elm.textContent = vnode.text;
             return;
         }
@@ -154,7 +154,6 @@ function patchFactory(modules: IModuleHook[] = []) {
         // 新老节点都有 children，且不相同的情况下，去对比 新老children，并更新
         if (oldChildren && children) {
             if (oldChildren !== children) {
-                // todo: 添加新老children对比
                 // console.log('all children');
                 updateChildren(elm, oldChildren, children);
             }
@@ -174,9 +173,8 @@ function patchFactory(modules: IModuleHook[] = []) {
             vnode.text && (elm.textContent = vnode.text);
         }
         // 都没有children，则只改变了textContent
+        // 不过在 h 函数中添加了处理，现在不会出现这种情况了
         else if (oldVnode.text !== vnode.text) {
-
-            // console.log('no children');
             elm.textContent = vnode.text;
         }
 
@@ -204,10 +202,9 @@ function patchFactory(modules: IModuleHook[] = []) {
             );
         }
 
-        // 比较2个vnode是否是同一个vnode，如果相同，就patch
+        // 比较2个vnode是否是可复用的vnode，如果可以，就patch
         // 是否是相同的 VNode 对象 判断依据是 key 跟 tagname 是否相同，既 对于相同类型dom元素尽可能复用
         if (VNode.isSameVNode(oldVnode, vnode)) {
-            // console.log('same node');
             patchVNode(oldVnode, vnode);
         }
         // 如果不是同一个vnode，把旧的删了创建新的

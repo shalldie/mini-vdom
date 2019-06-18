@@ -61,7 +61,7 @@ export default class VNode {
     }
 
     /**
-     * 是否是相同的 VNode 对象
+     * 是否是可复用的 VNode 对象
      * 判断依据是 key 跟 tagname 是否相同，既 对于相同类型dom元素尽可能复用
      *
      * @static

@@ -1,9 +1,13 @@
+/**
+ * props 包装
+ * 用于处理节点自身属性，跟attrs有些重合，主要处理难以用 attr 来表示的属性
+ *
+ * @example
+ * input.checked .disabled
+ */
+
 import VNode from "../VNode";
 import { IModuleHook } from "../hooks";
-
-/**
- * attribute 包装
- */
 
 export interface IProps {
     [key: string]: any;
@@ -26,6 +30,13 @@ export function updateProp(oldVnode: VNode, vnode: VNode): void {
     for (let key in oldProps) {
         if (!props[key]) {
             delete elm[key];
+        }
+    }
+
+    // 检查更新
+    for (let key in props) {
+        if (props[key] !== oldProps[key]) {
+            elm[key] = props[key];
         }
     }
 }
