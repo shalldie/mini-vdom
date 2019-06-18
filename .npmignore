@@ -1,0 +1,11 @@
+/build
+
+/node_modules
+
+/src
+
+/index.html
+
+/package-lock.json
+
+/tsconfig.json
