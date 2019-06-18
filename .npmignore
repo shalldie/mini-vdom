@@ -4,6 +4,8 @@
 
 /src
 
+/.babelrc
+
 /index.html
 
 /package-lock.json
