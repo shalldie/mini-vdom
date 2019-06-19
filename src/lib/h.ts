@@ -10,7 +10,7 @@ import { getType, getMatchList } from '../utils';
  * 生成 VNode
  *
  * @export
- * @param {string} type 标签类型 '' - TextNode '!' - 注释节点 'string' - 标签类型
+ * @param {string} type 标签(选择器)类型 'div#id.class[attr=val]' - 普通标签 '' - TextNode '!' - 注释节点
  * @param {string} [text] TextContent
  * @returns {VNode}
  */
@@ -20,7 +20,7 @@ export default function h(type: string, text?: string): VNode;
  * 生成 VNode
  *
  * @export
- * @param {string} type 标签类型 '' - TextNode '!' - 注释节点 'string' - 标签类型
+ * @param {string} type 标签(选择器)类型 'div#id.class[attr=val]' - 普通标签 '' - TextNode '!' - 注释节点
  * @param {VNode[]} [children] 子 VNode 数组
  * @returns {VNode}
  */
@@ -30,7 +30,7 @@ export default function h(type: string, children?: VNode[]): VNode;
  * 生成 VNode
  *
  * @export
- * @param {string} type type 标签类型 '' - TextNode '!' - 注释节点 'string' - 标签类型
+ * @param {string} type 标签(选择器)类型 'div#id.class[attr=val]' - 普通标签 '' - TextNode '!' - 注释节点
  * @param {IVNodeData} [data] vnode 需要包含的数据
  * @param {string} [text] TextContent
  * @returns {VNode}
@@ -41,7 +41,7 @@ export default function h(type: string, data?: IVNodeData, text?: string): VNode
  * 生成 VNode
  *
  * @export
- * @param {string} type type 标签类型 '' - TextNode '!' - 注释节点 'string' - 标签类型
+ * @param {string} type 标签(选择器)类型 'div#id.class[attr=val]' - 普通标签 '' - TextNode '!' - 注释节点
  * @param {IVNodeData} [data] vnode 需要包含的数据
  * @param {VNode[]} [children] 子 VNode 数组
  * @returns {VNode}

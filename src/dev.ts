@@ -1,167 +1,117 @@
 import { h, patch } from './index';
 import './dev.scss';
+import VNode from './lib/VNode';
 
-let oldNode: any = document.getElementById('app');
-let newNode: any = oldNode;
 
-function refresh() {
-    oldNode = newNode;
-    newNode = makeView();
-    patch(oldNode, newNode);
+interface ITodoItem {
+    content: string;
+    done: boolean;
 }
 
-refresh();
+let todoList: ITodoItem[] = [];
+let showList: ITodoItem[] = [];
+let currentFilter = 0;  // 0-全部 1-已完成 2-未完成
 
-function makeView() {
-
-    // const node = h('div#infoList.info-list.list-wrap', [
-    //     h('button', {
-    //         on: {
-    //             click() {
-    //                 refresh();
-    //             }
-    //         }
-    //     }, '随机重置列表')
-    // ]);
-    // // console.log(JSON.stringify(node));
-    // return node;
-
-    let children = rndChildren();
-
-    return h('div#app.box[data-box=box]', [
-        h('button', {
-            on: {
-                click() {
-                    refresh();
-                }
-            }
-        }, '随机重置列表'),
-        h('span', `一共 ${children.length} 条数据`),
-        h('ul', children)
-    ]);
+try {
+    todoList = JSON.parse(localStorage['todoList']);
+}
+catch{
+    todoList = [];
 }
 
-function rndChildren() {
-    let list = [];
-    let len = ~~(Math.random() * 10) + 8;
-
-    for (let i = 0; i < len; i++) {
-        list.push(
-            h('li.list-item', {
-                attrs: {
-                    class: 'attr-class'
-                },
-                on: {
-                    click() {
-                        console.log(`点击了第${i + 1}行`);
-                    }
-                }
-            }, `这是第${i + 1}行数据`)
-        )
+function renderView(filter: number = currentFilter) {
+    currentFilter = filter;
+    if (filter === 1) {
+        showList = todoList.filter(n => n.done);
     }
-    return list;
+    else if (filter === 2) {
+        showList = todoList.filter(n => !n.done);
+    }
+    else {
+        showList = todoList;
+    }
+    render();
+    localStorage['todoList'] = JSON.stringify(todoList);
 }
 
-// let node = h('ul.one-ul', {
-//     attrs: {
-//         style: 'color:#fff'
-//     }
-// }, [
-//         h('li', {
-//             attrs: {
-//                 style: 'color:#f00',
-//                 'data-name': 'tom'
-//             },
-//             on: {
-//                 click(ex) {
-//                     alert((ex.currentTarget as HTMLElement).dataset.name);
-//                 }
-//             }
-//         }, [
-//                 h('', 'lalala'),
-//                 h('span', {
-//                     attrs: {
-//                         style: 'color:#666;'
-//                     }
-//                 }, 'this is word')
-//             ]),
-//         h('li', {
-//             attrs: {
-//                 style: 'color:#2ad',
-//                 'data-name': 'lily'
-//             },
-//             on: {
-//                 click(ex) {
-//                     alert((ex.currentTarget as HTMLElement).dataset.name);
-//                 }
-//             }
-//         }, [
-//                 h('', 'this is word2')
-//             ])
-//     ]);
+const render = (() => {
+    let oldNode: any = document.getElementById('app');
+    let newNode: VNode = oldNode;
 
-// patch(
-//     document.getElementById('app'),
-//     node
-// );
+    return function () {
+        oldNode = newNode;
+        newNode = h('div.todo-list', [
+            h('h2.title', 'Todo List'),
+            h('div.input-row', [
+                h('input[type=text][placeholder=请输入要做的事情，回车添加]', {
+                    on: {
+                        keyup(ev) {
+                            if (ev.keyCode === 13) {
+                                let target = ev.target as HTMLInputElement;
+                                let val = target.value.trim();
+                                if (val.length) {
+                                    todoList.push({
+                                        content: val,
+                                        done: false
+                                    });
+                                    renderView();
+                                    target.value = '';
+                                }
+                            }
+                        }
+                    }
+                })
+            ]),
+            h('div.tab-list', [
+                h('div.tab-item',
+                    {
+                        attrs: { class: currentFilter === 0 ? 'active' : '' },
+                        on: { click: () => renderView(0) }
+                    },
+                    '全部'),
+                h('div.tab-item',
+                    {
+                        attrs: { class: currentFilter === 1 ? 'active' : '' },
+                        on: { click: () => renderView(1) }
+                    },
+                    '已完成'),
+                h('div.tab-item',
+                    {
+                        attrs: { class: currentFilter === 2 ? 'active' : '' },
+                        on: { click: () => renderView(2) }
+                    },
+                    '未完成')
+            ]),
+            h('ul.list-wrap', showList.map(item => h(
+                'li',
+                {
+                    attrs: {
+                        class: item.done ? 'done' : ''
+                    },
+                    on: {
+                        click: () => {
+                            item.done = !item.done;
+                            renderView();
+                        }
+                    },
+                },
+                [
+                    h('span.content', item.content),
+                    h('span.del', {
+                        on: {
+                            click() {
+                                let index = todoList.findIndex(n => n === item);
+                                todoList.splice(index, 1);
+                                renderView();
+                            }
+                        }
+                    }, '删除')
+                ]
+            )))
+        ]);
 
-// console.log(patch);
+        patch(oldNode, newNode);
+    }
+})();
 
-// let newNode = h('ul.two-ul', {
-//     attrs: {
-//         style: 'color:#2ad'
-//     }
-// }, [
-//         h('li#memeda[data-name=lalala]', {
-//             attrs: {
-//                 // 'id': 'memeda',
-//                 // 'data-name': 'lalala'
-//             }
-//         }, 'this is new 11'),
-//         h('li', 'this is new 2'),
-//         h('li', 'this is new 3'),
-//         h('li', [
-//             h('label', [
-//                 h('input', {
-//                     props: {
-//                         id: 'ele',
-//                         type: 'checkbox',
-//                         checked: true,
-//                         value: 'hello world'
-//                     },
-//                     attrs: {
-
-//                     }
-//                 }),
-//                 h('', 'click to toggle')
-//             ])
-//         ])
-//     ]);
-
-// setInterval(() => {
-//     patch(node, newNode);
-//     newNode = [node, node = newNode][0];
-// }, 1000);
-
-
-// setTimeout(() => {
-//     patch(node, newNode);
-//     newNode = [node, node = newNode][0];
-// }, 1000);
-
-// setTimeout(() => {
-//     patch(node, newNode);
-//     newNode = [node, node = newNode][0];
-// }, 2000);
-
-var timer = setInterval(() => {
-    // console.log('interval');
-    // try {
-    // patch(node, newNode);
-    // newNode = [node, node = newNode][0];
-    // }
-    // catch (ex) {
-    //     clearInterval(timer);
-    //     console.log(ex);
-    // }
-}, 3000);
+renderView();
