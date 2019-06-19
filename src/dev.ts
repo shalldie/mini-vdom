@@ -16,7 +16,11 @@ try {
     todoList = JSON.parse(localStorage['todoList']);
 }
 catch{
-    todoList = [];
+    todoList = [
+        { content: '买彩票', done: true },
+        { content: '中大奖', done: false },
+        { content: '走上人生巅峰', done: false }
+    ];
 }
 
 function renderView(filter: number = currentFilter) {
@@ -87,16 +91,17 @@ const render = (() => {
                 {
                     attrs: {
                         class: item.done ? 'done' : ''
-                    },
-                    on: {
-                        click: () => {
-                            item.done = !item.done;
-                            renderView();
-                        }
-                    },
+                    }
                 },
                 [
-                    h('span.content', item.content),
+                    h('span.content', {
+                        on: {
+                            click: () => {
+                                item.done = !item.done;
+                                renderView();
+                            }
+                        }
+                    }, item.content),
                     h('span.del', {
                         on: {
                             click() {
