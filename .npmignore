@@ -4,9 +4,17 @@
 
 /src
 
+/test
+
 /.babelrc
 
+/.gitignore
+
+/.travis.yml
+
 /index.html
+
+/jest.config.js
 
 /package-lock.json
 
