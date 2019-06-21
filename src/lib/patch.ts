@@ -77,16 +77,17 @@ function patchFactory(modules: IModuleHook[] = []) {
 
     function updateChildren(parentElm: Element, oldChildren: VNode[], children: VNode[]) {
 
-
+        // 方式一：
         // 如果想无脑点可以直接这样，不复用dom，直接把所有children都更新
         // removeVnodes(parentElm, oldChildren);
         // addVnodes(parentElm, null, children);
         // return;
 
-        // 当前算法是，顺序依次比较
+        // 方式二：
+        // 当前算法是，顺序依次找到可复用的元素
         // 对于大批量列表，从 上、中 部进行 添加、删除 操作效率上稍微不太友好，并不是最佳方式
-        // todos:
-        // 应该先在内存中把所有的位置，移动等都计算好，然后再进行操作。
+        // 有时候多次操作后的结果是元素没有移动，但还是会按照操作步骤来一遍
+        // 如果先在内存中把所有的位置，移动等都计算好，然后再进行操作，效率会更高。
 
         const oldMirror = oldChildren.slice();  // 用来表示哪些oldchildren被用过，位置信息等
         for (let i = 0; i < children.length; i++) {
