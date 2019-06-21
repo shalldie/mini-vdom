@@ -89,6 +89,7 @@ const render = (() => {
             h('ul.list-wrap', showList.map(item => h(
                 'li',
                 {
+                    key: item.content,
                     attrs: {
                         class: item.done ? 'done' : ''
                     }
