@@ -14,6 +14,69 @@ describe('测试 hook', () => {
         dom = document.getElementById('app');
     });
 
+    test('hook: create', () => {
+        expect(dom.parentNode).toBe(document.body);
+        const vnode = h('div', {
+            hook: {
+                create() {
+                    expect(vnode.elm.tagName).toBe('DIV'); // 这个是测试生成了dom节点
+                    expect(vnode.elm.parentNode).toBe(null);
+                }
+            }
+        });
+        patch(dom, vnode);
+    });
+
+    test('hook: insert', () => {
+        expect(dom.parentNode).toBe(document.body);
+        const vnode = h('div', {
+            hook: {
+                insert() {
+                    expect(dom.parentNode).toBe(document.body);
+                }
+            }
+        });
+        patch(dom, vnode);
+    });
+
+    test('hook: update', () => {
+        const mockFn = jest.fn();
+
+        const vnode = h('div');
+        patch(dom, vnode);
+
+        const newVnode = h('div', {
+            hook: {
+                create: mockFn, // 这俩不触发，因为复用了
+                insert: mockFn,
+                update() {
+                    mockFn('update');
+                },
+                destroy: mockFn
+            }
+        });
+        patch(vnode, newVnode);
+
+        expect(mockFn).toBeCalledTimes(1);
+        expect(mockFn).toBeCalledWith('update');
+    });
+
+    test('hook: destroy', () => {
+        const mockFn = jest.fn();
+
+        const vnode = h('span', {
+            hook: {
+                destroy: mockFn
+            }
+        });
+        patch(dom, vnode);
+
+        const newVnode = h('div');
+        patch(vnode, newVnode);
+
+        expect(mockFn).toBeCalledTimes(1);
+    });
+
     test('hook: create, insert, update, destroy', async () => {
         const mockFn = jest.fn();
         expect(dom.parentNode).toBe(document.body);
@@ -37,14 +100,10 @@ describe('测试 hook', () => {
 
         const newVnode = h('div', {
             hook: {
-                create: mockFn, // 这俩不触发，因为复用了
+                create: mockFn,
                 insert: mockFn,
-                update() {
-                    mockFn();
-                },
-                destroy() {
-                    mockFn();
-                }
+                update: mockFn, // 只有这个触发，因为复用了
+                destroy: mockFn
             }
         });
 
