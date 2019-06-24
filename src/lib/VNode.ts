@@ -6,6 +6,13 @@ import { IProps } from "./modules/Props";
 import { IAttrs } from "./modules/Attrs";
 import { IListener } from "./modules/Events";
 
+interface IVnodeHook {
+    create?: () => void;
+    insert?: () => void;
+    update?: () => void;
+    destroy?: () => void;
+}
+
 export interface IVNodeData {
 
     key?: string;
@@ -15,8 +22,9 @@ export interface IVNodeData {
     attrs?: IAttrs;
 
     on?: IListener;
-}
 
+    hook?: IVnodeHook;
+}
 
 export default class VNode {
 
@@ -39,6 +47,8 @@ export default class VNode {
         text?: string,
         elm?: Element
     ) {
+        data.hook = data.hook || {}; // 初始化一下可以避免很多判断
+
         this.type = type;
         this.data = data;
         this.children = children;

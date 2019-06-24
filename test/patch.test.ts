@@ -13,11 +13,9 @@ describe('function patch', () => {
         return [].slice.call(document.body.children).slice(-1)[0];
     }
 
-    beforeEach(next => {
+    beforeEach(() => {
         document.body.innerHTML = '<div id="app"></div>'
         dom = document.getElementById('app');
-
-        next();
     });
 
     test('初始化，patch dom', () => {

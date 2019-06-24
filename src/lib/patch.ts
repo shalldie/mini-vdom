@@ -8,7 +8,7 @@ const emptyVnode = new VNode('');
 
 function patchFactory(modules: IModuleHook[] = []) {
 
-    // 所有的钩子
+    // modules 的所有的钩子
     const cbs: Record<keyof IModuleHook, TModuleHookFunc[]> = {
         create: [], insert: [], update: [], destroy: [], remove: []
     };
@@ -45,6 +45,7 @@ function patchFactory(modules: IModuleHook[] = []) {
 
         // create 钩子
         cbs.create.forEach(hook => hook(emptyVnode, vnode));
+        vnode.data.hook.create && vnode.data.hook.create();
         return vnode.elm;
     }
 
@@ -56,10 +57,13 @@ function patchFactory(modules: IModuleHook[] = []) {
         endIndex: number = vnodes.length - 1
     ) {
         for (; startIndex <= endIndex; startIndex++) {
+            const vnode = vnodes[startIndex];
             parentElm.insertBefore(
-                createElm(vnodes[startIndex]),
+                createElm(vnode),
                 before
             );
+            cbs.insert.forEach(hook => hook(emptyVnode, vnode));
+            vnode.data.hook.insert && vnode.data.hook.insert();
         }
     }
 
@@ -70,8 +74,10 @@ function patchFactory(modules: IModuleHook[] = []) {
         endIndex: number = vnodes.length - 1
     ) {
         for (; startIndex <= endIndex; startIndex++) {
-            parentElm && parentElm.removeChild(vnodes[startIndex].elm);
-            cbs.destroy.forEach(hook => hook(vnodes[startIndex], emptyVnode));
+            const vnode = vnodes[startIndex];
+            parentElm && parentElm.removeChild(vnode.elm);
+            cbs.destroy.forEach(hook => hook(vnode, emptyVnode));
+            vnode.data.hook.destroy && vnode.data.hook.destroy();
         }
     }
 
@@ -150,6 +156,7 @@ function patchFactory(modules: IModuleHook[] = []) {
         // 注释节点不考虑
 
         // 如果是文本节点
+        // 不需要钩子，至少以某标签为单位
         if (vnode.text !== undefined && vnode.text !== oldVnode.text) {
             elm.textContent = vnode.text;
             return;
@@ -185,7 +192,7 @@ function patchFactory(modules: IModuleHook[] = []) {
         }
 
         cbs.update.forEach(hook => hook(oldVnode, vnode));
-
+        vnode.data.hook.update && vnode.data.hook.update();
     }
 
     /**
@@ -200,7 +207,8 @@ function patchFactory(modules: IModuleHook[] = []) {
         // 如果是dom对象，即初始化的时候
         if (!VNode.isVNode(oldVnode)) {
             oldVnode = new VNode(
-                (oldVnode as HTMLElement).tagName.toLowerCase(),
+                '', // 这里使dom不复用，触发生命周期钩子
+                // (oldVnode as HTMLElement).tagName.toLowerCase(),
                 {},
                 [],
                 undefined,

@@ -44,7 +44,7 @@ const render = (() => {
 
     return function () {
         oldNode = newNode;
-        newNode = h('div.todo-list', [
+        newNode = h('div#app.todo-list', [
             h('h2.title', 'Todo List'),
             h('div.input-row', [
                 h('input[type=text][placeholder=请输入要做的事情，回车添加]', {
