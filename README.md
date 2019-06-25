@@ -31,8 +31,8 @@ A mini virtual dom lib. 一个轻量级的虚拟dom库。
 
 ```ts
 import { h, patch } from 'mini-vdom'; // es module, typescript
-// const { h, patch } = require('MiniVDom'); // commonjs
-// const { h, patch } = window['MiniVDom']; // window
+// const { h, patch } = require('MiniVdom'); // commonjs
+// const { h, patch } = window['MiniVdom']; // window
 
 // 生成一个 vnode 节点
 const node = h('span', 'hello world');

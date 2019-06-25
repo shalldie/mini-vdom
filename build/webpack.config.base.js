@@ -15,7 +15,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, '../dist'),
         filename: '[name].js',
-        library: 'MiniVDom',
+        library: 'MiniVdom',
         libraryExport: 'default',
         libraryTarget: ifProduction ? 'umd' : undefined,
         publicPath: '/dist/'
