@@ -1,3 +1,7 @@
+# 已经迁移，请访问 mini-mvvm
+
+已经作为 monorepo 的子项目合并到 [https://github.com/shalldie/mini-mvvm](https://github.com/shalldie/mini-mvvm)
+
 # mini-vdom
 
 [![npm](https://img.shields.io/npm/v/mini-vdom.svg)](https://www.npmjs.com/package/mini-vdom) [![npm minzip size](https://img.shields.io/bundlephobia/minzip/mini-vdom.svg?label=npm%20minzip%20size)](https://www.npmjs.com/package/mini-vdom) [![Build Status](https://travis-ci.org/shalldie/mini-vdom.svg?branch=master)](https://travis-ci.org/shalldie/mini-vdom)
